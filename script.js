@@ -89,22 +89,57 @@ window.addEventListener('orientationchange', () => {
 });
 
 // Modified toggleFullScreen function for iOS
+let wakeLock = null;
+
+async function keepScreenOn() {
+    try {
+        if ('wakeLock' in navigator) {
+            // Request wake lock
+            wakeLock = await navigator.wakeLock.request('screen');
+            
+            // Re-request wake lock if page visibility changes
+            document.addEventListener('visibilitychange', async () => {
+                if (document.visibilityState === 'visible' && !wakeLock) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            });
+            
+            // Re-request wake lock after fullscreen change
+            document.addEventListener('fullscreenchange', async () => {
+                if (!wakeLock) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            });
+        } else {
+            console.log('Wake Lock API not supported');
+            // Fallback: play a silent video for iOS
+            if (isIOS) {
+                const video = document.createElement('video');
+                video.setAttribute('playsinline', '');
+                video.setAttribute('src', 'data:video/mp4;base64,AAAAIGZ0eXBtcDQyAAAAAG1wNDJtcDQxaXNvbWF2YzEAAATKbW9vdgAAAGxtdmhkAAAAANLEP5XSxD+VAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAP4AABUcWF2YWMAAAAwZ2F2Y0AAAAMPH4sIAAAABBxAREzHRwAB4kSAAAADHEFEzMdwAAHiRAAAABBkbXJvdgAAAAAAAAAAAAAAAAAAAAAAAAAAAHIAAAAYc3R0cwAAAAAAAAABAAAAQgAAQAAAAAAUc3RzcwAAAAAAAAABAAAAAQAAABxzdHNjAAAAAAAAAAEAAAABAAAAQAAAAAEAAAEgAAAAHHN0c3oAAAAAAAAAAAAAAEAAAADRAAABFAAAABRzdGNvAAAAAAAAAAEAAAAsAAAAYnVkdGEAAABabWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAtaWxzdAAAACWpdG9vAAAAHWRhdGEAAAABAAAAAExhdmY1OC40NS4xMDA=');
+                video.muted = true;
+                video.loop = true;
+                video.style.display = 'none';
+                document.body.appendChild(video);
+                video.play().catch(console.error);
+            }
+        }
+    } catch (err) {
+        console.log('Error keeping screen on:', err);
+    }
+}
+
 function toggleFullScreen() {
     if (isIOS) {
-        // On iOS, we'll just hide the message and show the clock
         fullscreenMessage.style.display = 'none';
         clockWrapper.classList.remove('hidden');
-        // Request screen wake lock if supported
-        if (navigator.wakeLock) {
-            navigator.wakeLock.request('screen').catch(err => {
-                console.log('Wake Lock error:', err);
-            });
-        }
+        keepScreenOn();
     } else {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().then(() => {
                 fullscreenMessage.style.display = 'none';
                 clockWrapper.classList.remove('hidden');
+                keepScreenOn();
             }).catch(err => {
                 console.error(`Error attempting to enable fullscreen: ${err.message}`);
             });
