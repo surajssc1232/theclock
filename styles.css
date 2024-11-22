@@ -27,19 +27,23 @@ body {
     z-index: 9999;
     cursor: pointer;
     transition: opacity 0.3s ease;
+    padding: 20px;
 }
 
 .message-content {
     text-align: center;
     color: #00ff00;
     text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-    font-size: 24px;
+    font-size: clamp(16px, 4vw, 24px);
     position: relative;
+    max-width: 90vw;
+    padding: 20px;
 }
 
 .typewriter-text, .typewriter-text-2 {
     margin: 0;
-    white-space: pre;
+    white-space: pre-wrap;
+    word-wrap: break-word;
     opacity: 0;
 }
 
@@ -53,7 +57,7 @@ body {
     top: 50%;
     transform: translateY(-50%);
     width: 10px;
-    height: 24px;
+    height: 1em;
     background-color: #00ff00;
     animation: blink-cursor 0.8s infinite;
 }
@@ -64,7 +68,7 @@ body {
 }
 
 .sub-message {
-    font-size: 16px;
+    font-size: clamp(14px, 3vw, 16px);
     margin-top: 10px;
     opacity: 0.7;
 }
@@ -84,20 +88,21 @@ body {
 
 .clock {
     display: flex;
-    gap: 15px;
+    gap: clamp(5px, 2vw, 15px);
     align-items: center;
     background: rgba(26, 26, 26, 0.8);
-    padding: 30px;
+    padding: clamp(15px, 4vw, 30px);
     border-radius: 10px;
     box-shadow: 0 0 30px rgba(0, 255, 0, 0.1);
     position: relative;
     z-index: 2;
     backdrop-filter: blur(5px);
+    transform: scale(clamp(0.5, 0.8, 1));
 }
 
 .time-unit {
     display: flex;
-    gap: 10px;
+    gap: clamp(5px, 1vw, 10px);
 }
 
 .cell-grid {
@@ -151,19 +156,43 @@ body {
     }
 }
 
-@media (max-width: 500px) {
+/* Mobile-specific adjustments */
+@media screen and (max-width: 480px) {
+    .message-content {
+        font-size: 18px;
+    }
+    
+    .sub-message {
+        font-size: 14px;
+        margin-top: 15px;
+    }
+    
+    .cursor {
+        height: 18px;
+        right: -12px;
+    }
+    
     .clock {
-        padding: 20px;
-        gap: 10px;
+        transform: scale(0.7);
     }
+}
 
-    .cell-grid {
-        width: 35px;
-        height: 55px;
-        gap: 3px;
+/* Small mobile devices */
+@media screen and (max-width: 320px) {
+    .message-content {
+        font-size: 16px;
     }
-
-    .separator {
-        font-size: 30px;
+    
+    .sub-message {
+        font-size: 12px;
+    }
+    
+    .cursor {
+        height: 16px;
+        right: -10px;
+    }
+    
+    .clock {
+        transform: scale(0.6);
     }
 }
