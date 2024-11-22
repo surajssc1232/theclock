@@ -1,3 +1,35 @@
+// Fullscreen functionality
+const fullscreenMessage = document.getElementById('fullscreenMessage');
+const clockWrapper = document.getElementById('clockWrapper');
+
+function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+            fullscreenMessage.style.display = 'none';
+            clockWrapper.classList.remove('hidden');
+        }).catch(err => {
+            console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+    }
+}
+
+// Event listeners for fullscreen
+document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement) {
+        fullscreenMessage.style.display = 'flex';
+        clockWrapper.classList.add('hidden');
+    }
+});
+
+fullscreenMessage.addEventListener('click', toggleFullScreen);
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'F11') {
+        e.preventDefault();
+        toggleFullScreen();
+    }
+});
+
 // Matrix Rain Effect
 const canvas = document.getElementById('matrixCanvas');
 const ctx = canvas.getContext('2d');

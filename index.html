@@ -7,21 +7,29 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <canvas id="matrixCanvas"></canvas>
-    <div class="clock">
-        <div class="time-unit">
-            <div class="cell-grid hours-tens"></div>
-            <div class="cell-grid hours-ones"></div>
+    <div id="fullscreenMessage" class="fullscreen-message">
+        <div class="message-content">
+            <p>Press F11 or click anywhere to enter fullscreen</p>
+            <p class="sub-message">Press ESC to exit fullscreen</p>
         </div>
-        <div class="separator">:</div>
-        <div class="time-unit">
-            <div class="cell-grid minutes-tens"></div>
-            <div class="cell-grid minutes-ones"></div>
-        </div>
-        <div class="separator">:</div>
-        <div class="time-unit">
-            <div class="cell-grid seconds-tens"></div>
-            <div class="cell-grid seconds-ones"></div>
+    </div>
+    <div id="clockWrapper" class="hidden">
+        <canvas id="matrixCanvas"></canvas>
+        <div class="clock">
+            <div class="time-unit">
+                <div class="cell-grid hours-tens"></div>
+                <div class="cell-grid hours-ones"></div>
+            </div>
+            <div class="separator">:</div>
+            <div class="time-unit">
+                <div class="cell-grid minutes-tens"></div>
+                <div class="cell-grid minutes-ones"></div>
+            </div>
+            <div class="separator">:</div>
+            <div class="time-unit">
+                <div class="cell-grid seconds-tens"></div>
+                <div class="cell-grid seconds-ones"></div>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>

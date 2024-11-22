@@ -11,6 +11,46 @@ body {
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    font-family: 'Courier New', monospace;
+}
+
+.fullscreen-message {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.message-content {
+    text-align: center;
+    color: #00ff00;
+    text-shadow: 0 0 10px #00ff00;
+    font-size: 24px;
+    animation: pulse 2s infinite;
+}
+
+.sub-message {
+    font-size: 16px;
+    margin-top: 10px;
+    opacity: 0.7;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.hidden {
+    display: none !important;
 }
 
 #matrixCanvas {
