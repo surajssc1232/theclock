@@ -88,30 +88,30 @@ body {
 
 .clock {
     display: flex;
-    gap: clamp(5px, 2vw, 15px);
+    gap: 10px;
     align-items: center;
     background: rgba(26, 26, 26, 0.8);
-    padding: clamp(15px, 4vw, 30px);
+    padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 30px rgba(0, 255, 0, 0.1);
     position: relative;
     z-index: 2;
     backdrop-filter: blur(5px);
-    transform: scale(clamp(0.5, 0.8, 1));
+    transform-origin: center;
 }
 
 .time-unit {
     display: flex;
-    gap: clamp(5px, 1vw, 10px);
+    gap: 8px;
 }
 
 .cell-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(5, 1fr);
-    gap: 4px;
-    width: 45px;
-    height: 75px;
+    gap: 2px;
+    width: 30px;
+    height: 50px;
 }
 
 .cell {
@@ -142,11 +142,11 @@ body {
 }
 
 .separator {
-    color: #00ff00;
     font-size: 40px;
-    font-weight: bold;
-    margin-top: -10px;
-    text-shadow: 0 0 10px #00ff00;
+    color: #00ff00;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    margin: 0 2px;
+    line-height: 1;
     animation: blink 1s infinite;
 }
 
@@ -200,41 +200,70 @@ body {
 
 /* Mobile-specific adjustments */
 @media screen and (max-width: 480px) {
-    .message-content {
-        font-size: 18px;
+    .clock {
+        padding: 15px;
+        gap: 8px;
+        transform: scale(0.8);
     }
-    
-    .sub-message {
-        font-size: 14px;
-        margin-top: 15px;
+
+    .cell-grid {
+        width: 25px;
+        height: 42px;
+        gap: 2px;
     }
-    
-    .cursor {
-        height: 18px;
-        right: -12px;
+
+    .separator {
+        font-size: 32px;
     }
-    
+}
+
+/* Small mobile devices */
+@media screen and (max-width: 380px) {
+    .clock {
+        padding: 12px;
+        gap: 6px;
+        transform: scale(0.7);
+    }
+
+    .cell-grid {
+        width: 22px;
+        height: 38px;
+        gap: 1.5px;
+    }
+
+    .separator {
+        font-size: 28px;
+    }
+}
+
+/* Extra small mobile devices */
+@media screen and (max-width: 320px) {
+    .clock {
+        padding: 10px;
+        gap: 5px;
+        transform: scale(0.6);
+    }
+
+    .cell-grid {
+        width: 20px;
+        height: 35px;
+        gap: 1px;
+    }
+
+    .separator {
+        font-size: 24px;
+    }
+}
+
+/* Handle different aspect ratios */
+@media screen and (max-aspect-ratio: 2/3) {
     .clock {
         transform: scale(0.7);
     }
 }
 
-/* Small mobile devices */
-@media screen and (max-width: 320px) {
-    .message-content {
-        font-size: 16px;
-    }
-    
-    .sub-message {
-        font-size: 12px;
-    }
-    
-    .cursor {
-        height: 16px;
-        right: -10px;
-    }
-    
+@media screen and (min-aspect-ratio: 2/1) {
     .clock {
-        transform: scale(0.6);
+        transform: scale(0.9);
     }
 }
