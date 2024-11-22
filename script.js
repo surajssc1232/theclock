@@ -11,34 +11,39 @@ let currentMessageIndex = 0;
 let currentCharIndex = 0;
 let isTyping = false;
 let typewriterTimeout = null;
+let typewriterCallbacks = [];
 
-function resetTypewriter() {
-    // Clear any ongoing timeouts
+function clearTypewriterTimeouts() {
     if (typewriterTimeout) {
         clearTimeout(typewriterTimeout);
         typewriterTimeout = null;
     }
-    
-    // Reset text and state
+    typewriterCallbacks.forEach(timeout => clearTimeout(timeout));
+    typewriterCallbacks = [];
+}
+
+function resetTypewriter() {
+    clearTypewriterTimeouts();
     typewriterText.textContent = '';
     typewriterText2.textContent = '';
     currentCharIndex = 0;
     isTyping = false;
-    
-    // Reset classes
     typewriterText.classList.remove('typing');
     typewriterText2.classList.remove('typing');
 }
 
 function typeWriter(element, message, callback) {
+    if (!element || isTyping === false) return;
+    
     if (currentCharIndex < message.length) {
-        element.textContent += message.charAt(currentCharIndex);
+        element.textContent = message.substring(0, currentCharIndex + 1);
         currentCharIndex++;
         typewriterTimeout = setTimeout(() => typeWriter(element, message, callback), 50);
     } else {
         currentCharIndex = 0;
         if (callback) {
-            typewriterTimeout = setTimeout(callback, 500);
+            const timeout = setTimeout(callback, 500);
+            typewriterCallbacks.push(timeout);
         }
     }
 }
@@ -49,10 +54,12 @@ function startTypewriter() {
         isTyping = true;
         typewriterText.classList.add('typing');
         typeWriter(typewriterText, messages[0], () => {
-            typewriterText2.classList.add('typing');
-            typeWriter(typewriterText2, messages[1], () => {
-                isTyping = false;
-            });
+            if (isTyping) {
+                typewriterText2.classList.add('typing');
+                typeWriter(typewriterText2, messages[1], () => {
+                    isTyping = false;
+                });
+            }
         });
     }
 }
@@ -117,9 +124,8 @@ document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) {
         fullscreenMessage.style.display = 'flex';
         clockWrapper.classList.add('hidden');
-        // Reset and restart typewriter effect
         resetTypewriter();
-        setTimeout(startTypewriter, 500);
+        setTimeout(startTypewriter, 100);
     }
 });
 
