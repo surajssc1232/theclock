@@ -1,7 +1,7 @@
 // Typewriter effect
 const messages = [
-    'Press F11 or click anywhere to enter fullscreen',
-    'Press ESC to exit fullscreen'
+    /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream ? 'Tap to start' : 'Press F11 or click anywhere to enter fullscreen',
+    /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream ? 'Add to Home Screen for best experience' : 'Press ESC to exit fullscreen'
 ];
 
 const typewriterText = document.querySelector('.typewriter-text');
@@ -64,15 +64,52 @@ startTypewriter();
 const fullscreenMessage = document.getElementById('fullscreenMessage');
 const clockWrapper = document.getElementById('clockWrapper');
 
-function toggleFullScreen() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().then(() => {
-            fullscreenMessage.style.display = 'none';
-            clockWrapper.classList.remove('hidden');
-        }).catch(err => {
-            console.error(`Error attempting to enable fullscreen: ${err.message}`);
-        });
+// iOS detection
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+// Prevent iOS scroll/bounce effects
+document.body.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+}, { passive: false });
+
+// Handle iOS orientation changes
+window.addEventListener('orientationchange', () => {
+    setTimeout(resizeCanvas, 50);
+    if (isIOS) {
+        // Force a re-render on orientation change
+        window.scrollTo(0, 0);
     }
+});
+
+// Modified toggleFullScreen function for iOS
+function toggleFullScreen() {
+    if (isIOS) {
+        // On iOS, we'll just hide the message and show the clock
+        fullscreenMessage.style.display = 'none';
+        clockWrapper.classList.remove('hidden');
+        // Request screen wake lock if supported
+        if (navigator.wakeLock) {
+            navigator.wakeLock.request('screen').catch(err => {
+                console.log('Wake Lock error:', err);
+            });
+        }
+    } else {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().then(() => {
+                fullscreenMessage.style.display = 'none';
+                clockWrapper.classList.remove('hidden');
+            }).catch(err => {
+                console.error(`Error attempting to enable fullscreen: ${err.message}`);
+            });
+        }
+    }
+}
+
+// Handle iOS PWA status
+if (window.navigator.standalone) {
+    // App is running in PWA mode on iOS
+    fullscreenMessage.style.display = 'none';
+    clockWrapper.classList.remove('hidden');
 }
 
 // Event listeners for fullscreen

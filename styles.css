@@ -156,6 +156,48 @@ body {
     }
 }
 
+/* iOS-specific styles */
+@supports (-webkit-touch-callout: none) {
+    body {
+        /* Prevent overscroll bounce */
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        overscroll-behavior: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .fullscreen-message {
+        /* Ensure proper height on iOS */
+        height: 100vh;
+        height: -webkit-fill-available;
+    }
+
+    .clock {
+        /* Prevent text selection on iOS */
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+
+    /* Fix for iPhone notch areas */
+    @supports (padding: max(0px)) {
+        .fullscreen-message {
+            padding-left: max(20px, env(safe-area-inset-left));
+            padding-right: max(20px, env(safe-area-inset-right));
+            padding-top: max(20px, env(safe-area-inset-top));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+        }
+    }
+}
+
+/* iOS PWA full-screen */
+@media all and (display-mode: standalone) {
+    body {
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+}
+
 /* Mobile-specific adjustments */
 @media screen and (max-width: 480px) {
     .message-content {
