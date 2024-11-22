@@ -87,17 +87,11 @@ body {
 }
 
 .clock {
-    --base-unit: min(4vw, 20px);
-    --digit-width: calc(var(--base-unit) * 2.25);
-    --digit-height: calc(var(--base-unit) * 3.75);
-    --digit-gap: calc(var(--base-unit) * 0.4);
-    --unit-gap: calc(var(--base-unit) * 1);
-    --separator-size: calc(var(--base-unit) * 2);
-    
     display: flex;
+    gap: clamp(5px, 2vw, 15px);
     align-items: center;
     background: rgba(26, 26, 26, 0.8);
-    padding: calc(var(--base-unit) * 1.5);
+    padding: clamp(15px, 4vw, 30px);
     border-radius: 10px;
     box-shadow: 0 0 30px rgba(0, 255, 0, 0.1);
     position: relative;
@@ -108,54 +102,25 @@ body {
 
 .time-unit {
     display: flex;
-    gap: var(--digit-gap);
-    margin: 0 var(--unit-gap);
-}
-
-/* Remove margin from first and last time units */
-.time-unit:first-child {
-    margin-left: 0;
-}
-
-.time-unit:last-child {
-    margin-right: 0;
+    gap: clamp(5px, 1vw, 10px);
 }
 
 .cell-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(5, 1fr);
-    gap: calc(var(--digit-gap) * 0.5);
-    width: var(--digit-width);
-    height: var(--digit-height);
-    min-width: var(--digit-width);  /* Prevent shrinking */
+    gap: 4px;
+    width: 45px;
+    height: 75px;
 }
 
-.separator {
-    color: #00ff00;
-    font-size: var(--separator-size);
-    font-weight: bold;
-    text-shadow: 0 0 10px #00ff00;
-    animation: blink 1s infinite;
-    width: calc(var(--unit-gap) * 2);
-    text-align: center;
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Ensure cells maintain aspect ratio */
 .cell {
     width: 100%;
     height: 100%;
     background-color: rgba(42, 42, 42, 0.8);
-    border-radius: calc(var(--digit-gap) * 0.5);
+    border-radius: 2px;
     transition: all 0.2s ease;
     position: relative;
-    aspect-ratio: 1;
 }
 
 .cell.active {
@@ -174,6 +139,15 @@ body {
     background-color: #ffffff;
     border-radius: 50%;
     opacity: 0.5;
+}
+
+.separator {
+    color: #00ff00;
+    font-size: 40px;
+    font-weight: bold;
+    margin-top: -10px;
+    text-shadow: 0 0 10px #00ff00;
+    animation: blink 1s infinite;
 }
 
 @keyframes blink {
@@ -241,7 +215,7 @@ body {
     }
     
     .clock {
-        --base-unit: min(3.5vw, 15px);
+        transform: scale(0.7);
     }
 }
 
@@ -261,6 +235,6 @@ body {
     }
     
     .clock {
-        --base-unit: min(3vw, 12px);
+        transform: scale(0.6);
     }
 }
