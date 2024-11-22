@@ -88,47 +88,50 @@ window.addEventListener('orientationchange', () => {
     }
 });
 
-// Modified toggleFullScreen function for iOS
+// Always-on display functionality
 let wakeLock = null;
 
 async function keepScreenOn() {
     try {
+        // Primary method: Wake Lock API
         if ('wakeLock' in navigator) {
-            // Request wake lock
             wakeLock = await navigator.wakeLock.request('screen');
             
-            // Re-request wake lock if page visibility changes
+            // Re-request wake lock when page becomes visible
             document.addEventListener('visibilitychange', async () => {
-                if (document.visibilityState === 'visible' && !wakeLock) {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                }
-            });
-            
-            // Re-request wake lock after fullscreen change
-            document.addEventListener('fullscreenchange', async () => {
-                if (!wakeLock) {
+                if (wakeLock !== null && document.visibilityState === 'visible') {
                     wakeLock = await navigator.wakeLock.request('screen');
                 }
             });
         } else {
-            console.log('Wake Lock API not supported');
-            // Fallback: play a silent video for iOS
-            if (isIOS) {
-                const video = document.createElement('video');
-                video.setAttribute('playsinline', '');
-                video.setAttribute('src', 'data:video/mp4;base64,AAAAIGZ0eXBtcDQyAAAAAG1wNDJtcDQxaXNvbWF2YzEAAATKbW9vdgAAAGxtdmhkAAAAANLEP5XSxD+VAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAP4AABUcWF2YWMAAAAwZ2F2Y0AAAAMPH4sIAAAABBxAREzHRwAB4kSAAAADHEFEzMdwAAHiRAAAABBkbXJvdgAAAAAAAAAAAAAAAAAAAAAAAAAAAHIAAAAYc3R0cwAAAAAAAAABAAAAQgAAQAAAAAAUc3RzcwAAAAAAAAABAAAAAQAAABxzdHNjAAAAAAAAAAEAAAABAAAAQAAAAAEAAAEgAAAAHHN0c3oAAAAAAAAAAAAAAEAAAADRAAABFAAAABRzdGNvAAAAAAAAAAEAAAAsAAAAYnVkdGEAAABabWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAtaWxzdAAAACWpdG9vAAAAHWRhdGEAAAABAAAAAExhdmY1OC40NS4xMDA=');
-                video.muted = true;
-                video.loop = true;
-                video.style.display = 'none';
-                document.body.appendChild(video);
-                video.play().catch(console.error);
-            }
+            // Fallback method 1: Hidden video for iOS
+            const video = document.createElement('video');
+            video.setAttribute('playsinline', '');
+            video.setAttribute('src', 'data:video/mp4;base64,AAAAIGZ0eXBtcDQyAAAAAG1wNDJtcDQxaXNvbWF2YzEAAATKbW9vdgAAAGxtdmhkAAAAANLEP5XSxD+VAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAP4AABUcWF2YWMAAAAwZ2F2Y0AAAAMPH4sIAAAABBxAREzHRwAB4kSAAAADHEFEzMdwAAHiRAAAABBkbXJvdgAAAAAAAAAAAAAAAAAAAAAAAAAAAHIAAAAYc3R0cwAAAAAAAAABAAAAQgAAQAAAAAAUc3RzcwAAAAAAAAABAAAAAQAAABxzdHNjAAAAAAAAAAEAAAABAAAAQAAAAAEAAAEgAAAAHHN0c3oAAAAAAAAAAAAAAEAAAADRAAABFAAAABRzdGNvAAAAAAAAAAEAAAAsAAAAYnVkdGEAAABabWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAtaWxzdAAAACWpdG9vAAAAHWRhdGEAAAABAAAAAExhdmY1OC40NS4xMDA=');
+            video.loop = true;
+            video.muted = true;
+            video.style.display = 'none';
+            document.body.appendChild(video);
+            video.play().catch(console.error);
+
+            // Fallback method 2: Periodic interaction simulation
+            setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    window.dispatchEvent(new Event('mousemove'));
+                }
+            }, 30000);
+        }
+
+        // Additional power management for mobile
+        if ('power' in navigator && navigator.power.powerSavingEnabled !== undefined) {
+            navigator.power.powerSavingEnabled = false;
         }
     } catch (err) {
-        console.log('Error keeping screen on:', err);
+        console.log('Error in screen wake lock:', err);
     }
 }
 
+// Modified toggleFullScreen function for iOS
 function toggleFullScreen() {
     if (isIOS) {
         fullscreenMessage.style.display = 'none';
@@ -146,6 +149,13 @@ function toggleFullScreen() {
         }
     }
 }
+
+// Handle visibility changes
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && clockWrapper.style.display !== 'none') {
+        keepScreenOn();
+    }
+});
 
 // Handle iOS PWA status
 if (window.navigator.standalone) {
