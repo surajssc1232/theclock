@@ -1,7 +1,7 @@
 // Typewriter effect
 const messages = [
-    /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream ? 'Tap to start' : 'Press F11 or click anywhere to enter fullscreen',
-    /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream ? 'Add to Home Screen for best experience' : 'Press ESC to exit fullscreen'
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ? 'Tap to start' : 'Press F11 or click anywhere to enter fullscreen',
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ? 'Add to Home Screen for best experience' : 'Press ESC to exit fullscreen'
 ];
 
 const typewriterText = document.querySelector('.typewriter-text');
