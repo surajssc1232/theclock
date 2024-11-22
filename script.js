@@ -88,40 +88,86 @@ window.addEventListener('orientationchange', () => {
     }
 });
 
-// Always-on display functionality
+// Screen wake lock functionality
 let wakeLock = null;
+let noSleepVideo = null;
 
-async function keepScreenOn() {
+async function keepScreenAwake() {
     try {
-        // Primary method: Wake Lock API
+        // Method 1: Wake Lock API
         if ('wakeLock' in navigator) {
-            wakeLock = await navigator.wakeLock.request('screen');
-            
-            // Re-request wake lock when page becomes visible
-            document.addEventListener('visibilitychange', async () => {
-                if (wakeLock !== null && document.visibilityState === 'visible') {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                }
-            });
-        } else {
-            // Fallback method 1: Hidden video for iOS
-            const video = document.createElement('video');
-            video.setAttribute('playsinline', '');
-            video.setAttribute('src', 'data:video/mp4;base64,AAAAIGZ0eXBtcDQyAAAAAG1wNDJtcDQxaXNvbWF2YzEAAATKbW9vdgAAAGxtdmhkAAAAANLEP5XSxD+VAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAP4AABUcWF2YWMAAAAwZ2F2Y0AAAAMPH4sIAAAABBxAREzHRwAB4kSAAAADHEFEzMdwAAHiRAAAABBkbXJvdgAAAAAAAAAAAAAAAAAAAAAAAAAAAHIAAAAYc3R0cwAAAAAAAAABAAAAQgAAQAAAAAAUc3RzcwAAAAAAAAABAAAAAQAAABxzdHNjAAAAAAAAAAEAAAABAAAAQAAAAAEAAAEgAAAAHHN0c3oAAAAAAAAAAAAAAEAAAADRAAABFAAAABRzdGNvAAAAAAAAAAEAAAAsAAAAYnVkdGEAAABabWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAtaWxzdAAAACWpdG9vAAAAHWRhdGEAAAABAAAAAExhdmY1OC40NS4xMDA=');
-            video.loop = true;
-            video.muted = true;
-            video.style.display = 'none';
-            document.body.appendChild(video);
-            video.play().catch(console.error);
-
-            // Fallback method 2: Periodic interaction simulation
-            setInterval(() => {
-                if (document.visibilityState === 'visible') {
-                    window.dispatchEvent(new Event('mousemove'));
-                }
-            }, 30000);
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+            } catch (err) {
+                console.log('Wake Lock API failed:', err);
+            }
         }
 
+        // Method 2: Video loop method (especially for iOS)
+        if (!noSleepVideo) {
+            noSleepVideo = document.createElement('video');
+            noSleepVideo.setAttribute('playsinline', '');
+            noSleepVideo.setAttribute('src', 'data:video/mp4;base64,AAAAIGZ0eXBtcDQyAAAAAG1wNDJtcDQxaXNvbWF2YzEAAATKbW9vdgAAAGxtdmhkAAAAANLEP5XSxD+VAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAP4AABUcWF2YWMAAAAwZ2F2Y0AAAAMPH4sIAAAABBxAREzHRwAB4kSAAAADHEFEzMdwAAHiRAAAABBkbXJvdgAAAAAAAAAAAAAAAAAAAAAAAAAAAHIAAAAYc3R0cwAAAAAAAAABAAAAQgAAQAAAAAAUc3RzcwAAAAAAAAABAAAAAQAAABxzdHNjAAAAAAAAAAEAAAABAAAAQAAAAAEAAAEgAAAAHHN0c3oAAAAAAAAAAAAAAEAAAADRAAABFAAAABRzdGNvAAAAAAAAAAEAAAAsAAAAYnVkdGEAAABabWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAtaWxzdAAAACWpdG9vAAAAHWRhdGEAAAABAAAAAExhdmY1OC40NS4xMDA=');
+            noSleepVideo.loop = true;
+            noSleepVideo.muted = true;
+            noSleepVideo.style.position = 'fixed';
+            noSleepVideo.style.top = '-1px';
+            noSleepVideo.style.left = '-1px';
+            noSleepVideo.style.width = '1px';
+            noSleepVideo.style.height = '1px';
+            noSleepVideo.style.opacity = '0';
+            document.body.appendChild(noSleepVideo);
+        }
+        noSleepVideo.play();
+    } catch (err) {
+        console.log('Error in keepScreenAwake:', err);
+    }
+}
+
+// Handle screen wake lock for visibility changes
+async function handleVisibilityChange() {
+    if (document.visibilityState === 'visible' && (document.fullscreenElement || isIOS)) {
+        await keepScreenAwake();
+    }
+}
+
+// Modified toggleFullScreen function
+function toggleFullScreen() {
+    if (isIOS) {
+        fullscreenMessage.style.display = 'none';
+        clockWrapper.classList.remove('hidden');
+        keepScreenAwake();
+    } else {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().then(() => {
+                fullscreenMessage.style.display = 'none';
+                clockWrapper.classList.remove('hidden');
+                keepScreenAwake();
+            }).catch(err => {
+                console.error(`Error attempting to enable fullscreen: ${err.message}`);
+            });
+        }
+    }
+}
+
+// Event listeners for screen wake lock
+document.addEventListener('visibilitychange', handleVisibilityChange);
+document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement) {
+        keepScreenAwake();
+    }
+});
+
+// Handle iOS PWA status
+if (window.navigator.standalone) {
+    fullscreenMessage.style.display = 'none';
+    clockWrapper.classList.remove('hidden');
+    keepScreenAwake();
+}
+
+// Always-on display functionality
+async function keepScreenOn() {
+    try {
         // Additional power management for mobile
         if ('power' in navigator && navigator.power.powerSavingEnabled !== undefined) {
             navigator.power.powerSavingEnabled = false;
@@ -131,38 +177,12 @@ async function keepScreenOn() {
     }
 }
 
-// Modified toggleFullScreen function for iOS
-function toggleFullScreen() {
-    if (isIOS) {
-        fullscreenMessage.style.display = 'none';
-        clockWrapper.classList.remove('hidden');
-        keepScreenOn();
-    } else {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().then(() => {
-                fullscreenMessage.style.display = 'none';
-                clockWrapper.classList.remove('hidden');
-                keepScreenOn();
-            }).catch(err => {
-                console.error(`Error attempting to enable fullscreen: ${err.message}`);
-            });
-        }
-    }
-}
-
 // Handle visibility changes
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && clockWrapper.style.display !== 'none') {
         keepScreenOn();
     }
 });
-
-// Handle iOS PWA status
-if (window.navigator.standalone) {
-    // App is running in PWA mode on iOS
-    fullscreenMessage.style.display = 'none';
-    clockWrapper.classList.remove('hidden');
-}
 
 // Event listeners for fullscreen
 document.addEventListener('fullscreenchange', () => {
