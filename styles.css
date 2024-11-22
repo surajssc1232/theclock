@@ -32,21 +32,41 @@ body {
 .message-content {
     text-align: center;
     color: #00ff00;
-    text-shadow: 0 0 10px #00ff00;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
     font-size: 24px;
-    animation: pulse 2s infinite;
+    position: relative;
+}
+
+.typewriter-text, .typewriter-text-2 {
+    margin: 0;
+    white-space: pre;
+    opacity: 0;
+}
+
+.typewriter-text.typing, .typewriter-text-2.typing {
+    opacity: 1;
+}
+
+.cursor {
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 24px;
+    background-color: #00ff00;
+    animation: blink-cursor 0.8s infinite;
+}
+
+@keyframes blink-cursor {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
 }
 
 .sub-message {
     font-size: 16px;
     margin-top: 10px;
     opacity: 0.7;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
 }
 
 .hidden {

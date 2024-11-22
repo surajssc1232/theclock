@@ -1,3 +1,44 @@
+// Typewriter effect
+const messages = [
+    'Press F11 or click anywhere to enter fullscreen',
+    'Press ESC to exit fullscreen'
+];
+
+const typewriterText = document.querySelector('.typewriter-text');
+const typewriterText2 = document.querySelector('.typewriter-text-2');
+let currentMessageIndex = 0;
+let currentCharIndex = 0;
+let isTyping = false;
+
+function typeWriter(element, message, callback) {
+    if (currentCharIndex < message.length) {
+        element.textContent += message.charAt(currentCharIndex);
+        currentCharIndex++;
+        setTimeout(() => typeWriter(element, message, callback), 50);
+    } else {
+        currentCharIndex = 0;
+        if (callback) callback();
+    }
+}
+
+function startTypewriter() {
+    if (!isTyping) {
+        isTyping = true;
+        typewriterText.classList.add('typing');
+        typeWriter(typewriterText, messages[0], () => {
+            setTimeout(() => {
+                typewriterText2.classList.add('typing');
+                typeWriter(typewriterText2, messages[1], () => {
+                    isTyping = false;
+                });
+            }, 500);
+        });
+    }
+}
+
+// Start typewriter effect immediately
+startTypewriter();
+
 // Fullscreen functionality
 const fullscreenMessage = document.getElementById('fullscreenMessage');
 const clockWrapper = document.getElementById('clockWrapper');
@@ -18,6 +59,10 @@ document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) {
         fullscreenMessage.style.display = 'flex';
         clockWrapper.classList.add('hidden');
+        // Reset and restart typewriter effect
+        typewriterText.textContent = '';
+        typewriterText2.textContent = '';
+        setTimeout(startTypewriter, 500);
     }
 });
 
