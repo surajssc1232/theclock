@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Clock</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+    <div class="clock">
+        <div class="time-unit">
+            <div class="cell-grid hours-tens"></div>
+            <div class="cell-grid hours-ones"></div>
+        </div>
+        <div class="separator">:</div>
+        <div class="time-unit">
+            <div class="cell-grid minutes-tens"></div>
+            <div class="cell-grid minutes-ones"></div>
+        </div>
+        <div class="separator">:</div>
+        <div class="time-unit">
+            <div class="cell-grid seconds-tens"></div>
+            <div class="cell-grid seconds-ones"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
